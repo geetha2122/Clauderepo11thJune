@@ -1,0 +1,1 @@
+Execute the unit testscripts available in tests folder and share the reports
