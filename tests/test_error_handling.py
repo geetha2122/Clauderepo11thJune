@@ -31,7 +31,7 @@ class TestGetSessionsErrorHandling:
             db.drop_all()
 
     def test_get_sessions_with_invalid_date_format(self):
-        """Test that invalid date format causes error (400 or 500)."""
+        """Test that invalid date format causes error."""
         # Arrange
         client = app.test_client()
 
@@ -39,8 +39,7 @@ class TestGetSessionsErrorHandling:
         response = client.get('/api/sessions?date=invalid-date')
 
         # Assert
-        # Currently returns 500; ideally should be 400
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 Bad Request, got {response.status_code}"
 
     def test_get_sessions_with_malformed_date_string(self):
         """Test with various malformed date strings."""
@@ -58,7 +57,7 @@ class TestGetSessionsErrorHandling:
         # Act & Assert
         for invalid_date in invalid_dates:
             response = client.get(f'/api/sessions?date={invalid_date}')
-            assert response.status_code in [400, 500], f"Failed for: {invalid_date}"
+            assert response.status_code == 400, f"Expected 400 for '{invalid_date}', got {response.status_code}"
 
     def test_get_sessions_with_empty_date_parameter(self):
         """Test with empty date parameter."""
@@ -69,7 +68,7 @@ class TestGetSessionsErrorHandling:
         response = client.get('/api/sessions?date=')
 
         # Assert
-        assert response.status_code in [200, 400, 500]
+        assert response.status_code == 400, f"Expected 400 Bad Request for empty date, got {response.status_code}"
 
     def test_get_sessions_with_null_date_parameter(self):
         """Test behavior when date parameter is null."""
@@ -110,8 +109,7 @@ class TestPostSessionsRequiredFieldValidation:
         response = client.post('/api/sessions', json=data)
 
         # Assert
-        # Currently may not validate; should return 400
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 for missing date field, got {response.status_code}"
 
     def test_create_session_missing_title_field(self):
         """Test that missing title field causes error."""
@@ -126,7 +124,7 @@ class TestPostSessionsRequiredFieldValidation:
         response = client.post('/api/sessions', json=data)
 
         # Assert
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 for missing title field, got {response.status_code}"
 
     def test_create_session_missing_type_field(self):
         """Test that missing type field causes error."""
@@ -141,7 +139,7 @@ class TestPostSessionsRequiredFieldValidation:
         response = client.post('/api/sessions', json=data)
 
         # Assert
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 for missing type field, got {response.status_code}"
 
     def test_create_session_with_all_required_fields_missing(self):
         """Test request with empty JSON body."""
@@ -153,7 +151,7 @@ class TestPostSessionsRequiredFieldValidation:
         response = client.post('/api/sessions', json=data)
 
         # Assert
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 for empty JSON body, got {response.status_code}"
 
     def test_create_session_with_null_required_fields(self):
         """Test request with null values for required fields."""
@@ -169,7 +167,7 @@ class TestPostSessionsRequiredFieldValidation:
         response = client.post('/api/sessions', json=data)
 
         # Assert
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 for null required fields, got {response.status_code}"
 
 
 class TestPostSessionsDateValidation:
@@ -200,8 +198,7 @@ class TestPostSessionsDateValidation:
         response = client.post('/api/sessions', json=data)
 
         # Assert
-        # Currently returns 500; should be 400
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 for invalid date format, got {response.status_code}"
 
     def test_create_session_with_various_invalid_dates(self):
         """Test various malformed date formats."""
@@ -223,7 +220,7 @@ class TestPostSessionsDateValidation:
                 'type': 'event'
             }
             response = client.post('/api/sessions', json=data)
-            assert response.status_code in [400, 500], f"Failed for: {invalid_date}"
+            assert response.status_code == 400, f"Expected 400 for invalid date '{invalid_date}', got {response.status_code}"
 
     def test_create_session_with_empty_date_string(self):
         """Test with empty date string."""
@@ -239,7 +236,7 @@ class TestPostSessionsDateValidation:
         response = client.post('/api/sessions', json=data)
 
         # Assert
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 for empty date string, got {response.status_code}"
 
     def test_create_session_with_numeric_date(self):
         """Test with numeric date instead of string."""
@@ -255,7 +252,7 @@ class TestPostSessionsDateValidation:
         response = client.post('/api/sessions', json=data)
 
         # Assert
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 for numeric date, got {response.status_code}"
 
 
 class TestPostSessionsTimeValidation:
@@ -287,7 +284,7 @@ class TestPostSessionsTimeValidation:
         response = client.post('/api/sessions', json=data)
 
         # Assert
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 for invalid start_time format, got {response.status_code}"
 
     def test_create_session_with_invalid_end_time_format(self):
         """Test that invalid end_time format causes error."""
@@ -304,7 +301,7 @@ class TestPostSessionsTimeValidation:
         response = client.post('/api/sessions', json=data)
 
         # Assert
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 for invalid end_time format, got {response.status_code}"
 
     def test_create_session_with_time_format_hh_mm_ss(self):
         """Test that HH:MM:SS format causes error (expects HH:MM)."""
@@ -321,8 +318,7 @@ class TestPostSessionsTimeValidation:
         response = client.post('/api/sessions', json=data)
 
         # Assert
-        # Currently returns 500; should ideally return 400
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 for HH:MM:SS format, got {response.status_code}"
 
     def test_create_session_with_various_invalid_time_formats(self):
         """Test various invalid time formats."""
@@ -346,7 +342,7 @@ class TestPostSessionsTimeValidation:
                 'start_time': invalid_time
             }
             response = client.post('/api/sessions', json=data)
-            assert response.status_code in [400, 500], f"Failed for: {invalid_time}"
+            assert response.status_code == 400, f"Expected 400 for invalid time '{invalid_time}', got {response.status_code}"
 
     def test_create_session_with_time_as_numeric(self):
         """Test with numeric time instead of string."""
@@ -363,7 +359,7 @@ class TestPostSessionsTimeValidation:
         response = client.post('/api/sessions', json=data)
 
         # Assert
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 for numeric time, got {response.status_code}"
 
 
 class TestPostSessionsTypeValidation:
@@ -429,7 +425,7 @@ class TestPostSessionsTypeValidation:
         assert response.status_code == 201
 
     def test_create_session_with_invalid_type(self):
-        """Test that invalid session type causes error or is rejected."""
+        """Test that invalid session type is rejected."""
         # Arrange
         client = app.test_client()
         invalid_types = [
@@ -443,7 +439,7 @@ class TestPostSessionsTypeValidation:
             'event/task',  # Multiple types
         ]
 
-        # Act & Assert - Note: Currently API may not validate type values
+        # Act & Assert
         for invalid_type in invalid_types:
             data = {
                 'date': '2026-06-12',
@@ -451,8 +447,7 @@ class TestPostSessionsTypeValidation:
                 'type': invalid_type
             }
             response = client.post('/api/sessions', json=data)
-            # Should ideally be 400, but currently may be 201
-            assert response.status_code in [201, 400], f"Unexpected for type: {invalid_type}"
+            assert response.status_code == 400, f"Expected 400 for invalid type '{invalid_type}', got {response.status_code}"
 
     def test_create_session_with_numeric_type(self):
         """Test with numeric type instead of string."""
@@ -468,7 +463,7 @@ class TestPostSessionsTypeValidation:
         response = client.post('/api/sessions', json=data)
 
         # Assert
-        assert response.status_code in [400, 500, 201]
+        assert response.status_code == 400, f"Expected 400 for numeric type, got {response.status_code}"
 
 
 class TestPostSessionsMalformedRequests:
@@ -498,7 +493,7 @@ class TestPostSessionsMalformedRequests:
         )
 
         # Assert
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 for invalid JSON, got {response.status_code}"
 
     def test_create_session_with_empty_json(self):
         """Test with empty JSON object."""
@@ -509,7 +504,7 @@ class TestPostSessionsMalformedRequests:
         response = client.post('/api/sessions', json={})
 
         # Assert
-        assert response.status_code in [400, 500]
+        assert response.status_code == 400, f"Expected 400 for empty JSON, got {response.status_code}"
 
     def test_create_session_without_json_content_type(self):
         """Test POST without Content-Type: application/json."""

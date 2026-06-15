@@ -115,10 +115,11 @@ class TestSessionModelCreation:
                 )
                 db.session.add(session)
                 db.session.commit()
+                assert session.id is not None, "Session ID should be auto-incremented after commit"
                 ids.append(session.id)
 
             # Assert
-            assert ids == [1, 2, 3, 4, 5]
+            assert ids == [1, 2, 3, 4, 5], f"Expected IDs [1, 2, 3, 4, 5], got {ids}"
 
     def test_session_with_unicode_characters(self):
         """Test creating Session with unicode characters in title and description."""
@@ -313,11 +314,15 @@ class TestSessionModelQueries:
     def test_query_all_sessions(self):
         """Test querying all sessions without filters."""
         with app.app_context():
+            # Verify fixture setup
+            setup_count = Session.query.count()
+            assert setup_count == 10, f"Fixture setup should create 10 sessions, got {setup_count}"
+
             # Act
             sessions = Session.query.all()
 
             # Assert
-            assert len(sessions) == 10  # 5 days * 2 types
+            assert len(sessions) == 10, f"Expected 10 sessions, got {len(sessions)}"
 
     def test_query_sessions_returns_empty_for_nonexistent_date(self):
         """Test that querying non-existent date returns empty list."""

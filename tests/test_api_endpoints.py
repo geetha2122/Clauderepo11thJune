@@ -212,6 +212,7 @@ class TestGetSessionsEndpoint:
 
         # Act
         response = client.get('/api/sessions?date=2026-06-12')
+        assert len(response.json) > 0, "Expected at least one session in response"
         session_data = response.json[0]
 
         # Assert
